@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Cloud</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: white;
+    }
+    header {
+      padding: 20px;
+      background: #111a30;
+      border-bottom: 1px solid #28334d;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    header span { color: #7c9cff; }
+    main {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    h1 { font-size: 36px; }
+    p { color: #b8c3dc; line-height: 1.6; }
+    #chat {
+      margin-top: 30px;
+      background: #141d33;
+      padding: 18px;
+      border: 1px solid #303c59;
+      border-radius: 16px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #394764;
+      background: #0b1020;
+      color: white;
+      font-size: 16px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 12px;
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 9px;
+      background: #718cff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    #answer {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <header>☁ AI <span>Cloud</span></header>
+  <main>
+    <h1>Your AI workspace.</h1>
+    <p>Ask questions, explore ideas and get help with your work.</p>
+    <section id="chat">
+      <textarea id="message" placeholder="Ask AI anything..."></textarea>
+      <button id="send">Ask AI ↗</button>
+      <div id="answer"></div>
+    </section>
+  </main>
+  <script>
+    const message = document.getElementById("message");
+    const answer = document.getElementById("answer");
+    const send = document.getElementById("send");
+
+    send.addEventListener("click", async () => {
+      const text = message.value.trim();
+      if (!text) {
+        answer.textContent = "Please enter a question first.";
+        return;
+      }
+
+      send.disabled = true;
+      answer.textContent = "AI is thinking...";
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Request failed");
+        answer.textContent = data.answer;
+      } catch (error) {
+        answer.textContent = "Error: " + error.message;
+      } finally {
+        send.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
